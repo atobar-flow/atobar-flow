@@ -1,0 +1,12 @@
+{
+  "max_stdout_truncation_chars": 4000,
+  "max_ci_retries": 3,
+  "max_wall_clock_minutes": 60,
+  "wip_state_branch_prefix": "flow-wip/",
+  "bot_logins": {
+    "developer": "atobar-flow-agent[bot]",
+    "evaluator": "atobar-flow-agent[bot]",
+    "arbitrator": "atobar-flow-agent[bot]",
+    "conductor": "atobar-flow-agent[bot]"
+  }
+}

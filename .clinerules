@@ -1,0 +1,15 @@
+# AI Agent Instructions
+
+If you are an AI assistant (Claude, GPT, Gemini, Cursor, Cline, Devin, pi, etc.) operating in this repository, read **`AGENTS.md`** in the repository root first.
+
+**Context-Hygiene Mandate**:
+- **DO NOT** run `cat docs/AGENTS.md docs/SOTA26_HEURISTICS.md docs/SWARM_ARCHITECTURE.md docs/ROADMAP.md` upfront.
+- Query `docs/` on-demand using `rg -n "<term>" docs/` and read only the relevant sections (`limit <= 120`):
+  1. **`docs/AGENTS.md`**: role boundaries (DEVELOPER / EVALUATOR / ARBITRATOR / CONDUCTOR), PR-comment handoff protocol, Definition of Done.
+  2. **`docs/SOTA26_HEURISTICS.md`**: core architectural axioms.
+  3. **`docs/SWARM_ARCHITECTURE.md`**: multi-tenant swarm topology, envelope schemas, tenant manifest, metric contract.
+  4. **`docs/ROADMAP.md`**: current milestones and issue workflow.
+
+**Know your role.** At runtime, the factory injects `FLOW_ROLE` (`developer` | `evaluator` | `arbitrator`) and `FLOW_TENANT`. You act **only** within that role's boundary and communicate **only** through `flow-*` envelopes in the PR thread. If `FLOW_ROLE` is unset, you are a human-directed contributor to the factory itself: follow root `AGENTS.md` and use `rg -n` on `docs/` when needed.
+
+**Templates (mandatory):** before opening or updating a PR, fill in `.github/PULL_REQUEST_TEMPLATE.md` (including the Adversarial Self-Review corner-case and assumption audit). When reviewing a PR, follow `.github/REVIEW_TEMPLATE.md`.

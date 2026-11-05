@@ -1,0 +1,75 @@
+services:
+  api:
+    image: ${CP_IMAGE:-ghcr.io/atobar-flow/control-panel:latest}
+    env_file:
+      - path: /etc/atobar/cp.env
+        required: false
+      - path: /etc/atobar/aws-kms.env
+        required: false
+    environment:
+      - FE_URL=${FE_URL:-http://flow-engine:8081}
+      - CP_SCREENSHOT_DIR=${CP_SCREENSHOT_DIR:-/var/lib/atobar/screenshots}
+    volumes:
+      - screenshots_data:/var/lib/atobar/screenshots
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    restart: unless-stopped
+    depends_on: [flow-engine]
+    networks: [edge, backend]
+  flow-engine:
+    image: ${FE_IMAGE:-ghcr.io/atobar-flow/flow-engine:latest}
+    env_file:
+      - path: /etc/atobar/cp.env
+        required: false
+      - path: /etc/atobar/aws.env
+        required: false
+    expose:
+      - "8081"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    restart: unless-stopped
+    networks: [backend]
+  janitor:
+    image: ${FE_IMAGE:-ghcr.io/atobar-flow/flow-engine:latest}
+    command: ["python", "-m", "flow_engine.janitor"]
+    env_file:
+      - path: /etc/atobar/cp.env
+        required: false
+      - path: /etc/atobar/aws.env
+        required: false
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    restart: unless-stopped
+    depends_on: [flow-engine]
+    networks: [backend]
+  caddy:
+    image: public.ecr.aws/docker/library/caddy:2
+    command: caddy reverse-proxy --from ${CP_HOSTNAME:-localhost} --to api:8080
+    ports: ["80:80", "443:443"]
+    volumes: ["caddy_data:/data"]
+    restart: unless-stopped
+    depends_on: [api]
+    networks: [edge]
+networks:
+  edge:
+    driver: bridge
+  backend:
+    driver: bridge
+volumes:
+  caddy_data: {}
+  screenshots_data: {}

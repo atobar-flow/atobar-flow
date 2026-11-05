@@ -1,0 +1,65 @@
+[project]
+name = "atobar-flow-workspace"
+version = "0.2.0"
+description = "ATOBAR (Agentic Teams On BYOK And Repos) — Autonomous AI SWE orchestrator and Hub-and-Spoke Software Factory on GitHub"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv.workspace]
+members = ["contracts", "control-panel", "flow-engine", "flow-agent", "atobar-ops"]
+
+[dependency-groups]
+dev = [
+    "pytest==8.1.1",
+    "pytest-asyncio==0.23.6",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+faulthandler_timeout = 60
+pythonpath = [
+    "contracts/src",
+    "control-panel/src",
+    "flow-engine/src",
+    "flow-agent/src",
+    "atobar-ops/src",
+    "control-panel/tests",
+]
+testpaths = [
+    "contracts/tests",
+    "control-panel/tests",
+    "flow-engine/tests",
+    "flow-agent/tests",
+    "atobar-ops/tests",
+    "tests",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+exclude = [
+    ".venv",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    "build",
+    "dist",
+    "infra/supabase/migrations",
+    "node_modules",
+]
+
+[tool.ruff.lint]
+select = ["E9", "F", "W6"]
+ignore = [
+    "F401",
+]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true

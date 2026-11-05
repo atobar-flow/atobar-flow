@@ -1,0 +1,26 @@
+title = "atobar-flow gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "atobar-tenant-token"
+description = "Atobar Flow tenant API token (atb_...)"
+regex = '''\batb_[A-Za-z0-9_\-]{16,}\b'''
+
+[[rules]]
+id = "atobar-hardcoded-cp-domain"
+description = "Hardcoded Control Panel or legacy domain (must be composed from CP_HOSTNAME / CP_PUBLIC_URL secret)"
+regex = '''(?i)\b(?:cp\.atobar\.[o]rg|cp\.karar\.[a]sia|karar\.[a]sia)\b'''
+
+[[rules]]
+id = "atobar-hardcoded-infra-id"
+description = "Hardcoded cloud account, Supabase project ref, or HCP Terraform identifier"
+regex = '''\b(?:[5]48573046718|[k]vmoyteikqwjlywtsdit|varset-[K]yzypmnkZzd5pZyq|prj-[t]7D12g942Vx6i4kS)\b'''
+
+[allowlist]
+description = "Allow snake_case metric identifiers with unit suffixes (e.g. p95_latency_ms) on generic-api-key"
+regexTarget = "secret"
+regexes = [
+  "^(?:p(?:50|90|95|99|999)_)?[a-z]{2,12}(?:_[a-z]{2,12}){0,3}_(?:ms|s|pct|usd|count|ratio|bytes)$",
+]

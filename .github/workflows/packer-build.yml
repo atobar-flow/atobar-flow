@@ -1,0 +1,99 @@
+name: Packer AMI Build & Publish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/packer/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infra/packer/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  PACKER_DIR: infra/packer
+
+jobs:
+  validate:
+    name: Packer Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+
+      - name: Packer Init
+        working-directory: ${{ env.PACKER_DIR }}
+        run: packer init flow-sandbox.pkr.hcl
+
+      - name: Packer Validate
+        working-directory: ${{ env.PACKER_DIR }}
+        run: packer validate flow-sandbox.pkr.hcl
+
+  build:
+    name: Packer Build & Publish
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION || 'us-west-2' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PACKER_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+
+      - name: Packer Init
+        working-directory: ${{ env.PACKER_DIR }}
+        run: packer init flow-sandbox.pkr.hcl
+
+      - name: Packer Build
+        working-directory: ${{ env.PACKER_DIR }}
+        run: |
+          # shellcheck disable=SC2016
+          VPC_ID=$(aws ec2 describe-vpcs --filters Name=tag:Project,Values=flow --query 'Vpcs[0].VpcId' --output text)
+          # shellcheck disable=SC2016
+          SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:Project,Values=flow" --query 'Subnets[?MapPublicIpOnLaunch==`true`].[SubnetId]' --output text | head -n 1)
+
+          packer build -var "aws_region=${AWS_REGION}" -var "vpc_id=$VPC_ID" -var "subnet_id=$SUBNET_ID" -machine-readable flow-sandbox.pkr.hcl | tee build.log
+          AMI_ID=$(grep 'artifact,0,id' build.log | cut -d: -f2)
+          echo "AMI_ID=$AMI_ID" >> "$GITHUB_ENV"
+          echo "Published AMI: $AMI_ID"
+
+      - name: Cleanup Old AMIs (Keep 2 Most Recent)
+        run: |
+          echo "Finding old flow-sandbox AMIs..."
+          AMIS=$(aws ec2 describe-images \
+            --owners self \
+            --filters "Name=name,Values=flow-sandbox-v*" \
+            --query 'sort_by(Images, &CreationDate)[:-2].[ImageId,BlockDeviceMappings[0].Ebs.SnapshotId]' \
+            --output text)
+
+          if [ -z "$AMIS" ]; then
+            echo "No old AMIs to clean up."
+            exit 0
+          fi
+
+          while read -r AMI_ID SNAPSHOT_ID; do
+            echo "Deregistering AMI: $AMI_ID"
+            aws ec2 deregister-image --image-id "$AMI_ID"
+            if [ "$SNAPSHOT_ID" != "None" ] && [ -n "$SNAPSHOT_ID" ]; then
+              echo "Deleting Snapshot: $SNAPSHOT_ID"
+              aws ec2 delete-snapshot --snapshot-id "$SNAPSHOT_ID"
+            fi
+          done <<< "$AMIS"
+          echo "Cleanup complete."

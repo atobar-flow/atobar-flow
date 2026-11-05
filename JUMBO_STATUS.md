@@ -1,0 +1,18 @@
+- J54: Domain-Neutral Configuration Rule, Public-Repo onboard.sh Delivery, 3-State Repository UX (Listed / Ready / Blocked), and 1-Line Uninstall/Cleanup (https://github.com/atobar-flow/atobar-flow/issues/2)
+- J53: Per-Invoking-User BYOK Billing, Profile-Level Default Keys, Collaborator Repo Keys & Unonboarded Trigger Gate (https://github.com/atobar-flow/atobar-flow/issues/1)
+- J52 (#372): Completed WP-1..WP-5 — Public Domain Migration to github.com/atobar-flow, Secret-Composed Control Panel Re-Homing, GHCR Service Separation, Terraform GitHub App Provisioning, and User Zero Bootstrap (https://github.com/atobar-flow/atobar-flow/issues/372)
+- J51 (#370): Completed WP-1..WP-4 — Reconcile As-Built Architecture with Co-Founder BYOK Vision: Canonical PRD, HLD & GitHub Scrollytelling Spec (https://github.com/atobar-flow/atobar-flow/issues/370)
+- J50 (#368): Completed WP-1..WP-3 — SotaWiki Lifecycle: Mermaid Architecture Synthesis, Coalesced Auto-Refresh Queue, Control Panel Repo Screen & Dead-Code Purge (https://github.com/atobar-flow/atobar-flow/issues/368)
+- J49 (#365): Completed WP-1..WP-6 — Unified @atobar-flow-agent Issue (= Plan) & PR (= Correction) Steering, Actionable Evaluator UX, and Verifiable Screenshot Provenance (https://github.com/atobar-flow/atobar-flow/issues/365)
+- J45 (#346): Completed WP-1..WP-5 — CI FinOps & Test-Suite Modernization: One Billable Job per Push, Single Combined Mypy, Checksummed Binary Downloads, Runaway-Job Caps & Billed-Minutes Ratchet (https://github.com/atobar-flow/atobar-flow/issues/346)
+- J44 (#339): Completed WP-1..WP-5 — Path 3: LLM Adversarial Surface Containment (nanobot home separated from client worktree, PTY secret stripping & realpath containment, untrusted content delimiter neutralization & wrapping, CP-hosted screenshot URL allowlist, and goal-loop spend roll-up verification) (https://github.com/atobar-flow/atobar-flow/issues/339)
+- J43 (#338): Completed WP-1..WP-5 — Path 2: Infrastructure Security: Least-Privilege GitHub OIDC Role, No Cross-Trust Warm VM Reuse, Fail-Closed Secret Refresh, KMS Activation & EBS/VNC/DB Hygiene (https://github.com/atobar-flow/atobar-flow/issues/338)
+- J42 (#337): Completed WP-1..WP-6 — Path 1: User Journey Security: Envelope Authenticity, Role-Scoped Run Credentials, Loop-Budget Integrity, Untrusted Artifact Bounds & Fail-Closed Signing Keys (https://github.com/atobar-flow/atobar-flow/issues/337)
+- J39 (#317): Completed WP-1..WP-4 — Two-Stage Evaluator Review (`file:<path>#L<start>-L<end>` evidence validation, progressive-disclosure `format_evaluator_review_summary` with SHA-pinned GitHub blob permalinks & fence sanitization, Stage 1 static/contract short-circuit prompt, and roadmap sync) (https://github.com/atobar-flow/atobar-flow/issues/317)
+- J41 (#333): Completed WP-1..WP-9 (PR #334) — Harness guardrails from SEQ-05 retro: CI-parity `atobar-ops verify`, `ship`/`review`/`jumbo` fixes, `MemoryStore` deep-copy getters, Spot `UserData` & `hasattr(store)` mechanical guards, Gitleaks metric-key allowlist, and symlink shims (https://github.com/atobar-flow/atobar-flow/issues/333)
+- J38 (#311): Completed WP-1..WP-6 — Spec-Sufficiency Triage Gate (`sufficiency.py`), Separated PLANNER Role (`flow-plan`), `SotaWiki` runtime injection, and Warm Spot Instance Reuse via isolated `git worktree` sandboxes (`POST /v1/runs/{run_id}/turn-complete`).
+- J37: atobar-ops: unified operations skill & CLI (https://github.com/atobar-flow/atobar-flow/issues/309)
+- J07 (#212): PR #228 opened. Owner step required.
+- J11 (#216): PR #229 opened. Owner step required.
+- J35 (#302): Implemented WP-1..WP-6 for `arsenyspb/ollama-monitor#33` E2E readiness.
+

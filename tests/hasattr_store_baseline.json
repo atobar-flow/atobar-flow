@@ -1,0 +1,8 @@
+{
+  "contracts/src/atobar_contracts/conductor_io.py": 12,
+  "control-panel/src/control_panel/app.py": 14,
+  "control-panel/src/control_panel/auth.py": 3,
+  "control-panel/src/control_panel/flow_engine_client.py": 47,
+  "control-panel/src/control_panel/web.py": 9,
+  "flow-engine/src/flow_engine/api.py": 32
+}

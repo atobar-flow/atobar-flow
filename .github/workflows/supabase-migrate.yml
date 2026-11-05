@@ -1,0 +1,64 @@
+name: Supabase Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/supabase/migrations/**"
+      - "scripts/supabase_migrate.sh"
+      - ".github/workflows/supabase-migrate.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List pending migrations without applying (must run from main; OIDC role is pinned to refs/heads/main)"
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: supabase-migrate
+  cancel-in-progress: false
+
+env:
+  PGDATABASE: postgres
+  PGSSLMODE: require
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DISPATCHER_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-west-2' }}
+
+      - name: Load DB credentials from Secrets Manager
+        run: |
+          SECRET=$(aws secretsmanager get-secret-value --secret-id flow/supabase/credentials \
+                   --query SecretString --output text)
+          PW=$(jq -r '.db_password // empty' <<<"$SECRET")
+          PGHOST_VAL=$(jq -r '.pghost // empty' <<<"$SECRET")
+          PGPORT_VAL=$(jq -r '.pgport // "5432"' <<<"$SECRET")
+          PGUSER_VAL=$(jq -r '.pguser // empty' <<<"$SECRET")
+          if [ -z "$PGUSER_VAL" ]; then
+            API_URL=$(jq -r '.api_url // empty' <<<"$SECRET")
+            REF=$(sed -n 's|https://\([a-z0-9]*\)\.supabase\.co.*|\1|p' <<<"$API_URL")
+            PGUSER_VAL="postgres.${REF}"
+          fi
+          echo "::add-mask::$PW"
+          {
+            echo "PGPASSWORD=$PW"
+            echo "PGHOST=$PGHOST_VAL"
+            echo "PGPORT=$PGPORT_VAL"
+            echo "PGUSER=$PGUSER_VAL"
+          } >> "$GITHUB_ENV"
+
+      - name: Apply migrations
+        run: scripts/supabase_migrate.sh ${{ inputs.dry_run && '--dry-run' || '' }}

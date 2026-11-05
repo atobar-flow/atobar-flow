@@ -1,0 +1,14 @@
+[Unit]
+Description=Chromium Headless with CDP
+After=openbox.service
+Requires=openbox.service
+
+[Service]
+Type=simple
+User=ubuntu
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/chromium --remote-debugging-port=29229 --use-angle=swiftshader-webgl --disable-gpu --no-sandbox --window-size=1600,1200 --start-maximized --disable-blink-features=AutomationControlled
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

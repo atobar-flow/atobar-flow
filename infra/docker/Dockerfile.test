@@ -1,0 +1,45 @@
+# Local AMI Provisioning Test Harness
+#
+# Reproduces the flow-sandbox AMI environment inside an Ubuntu 24.04 container
+# with systemd enabled. Useful for validating `install_deps.sh` and systemd unit files
+# locally without waiting for cloud Packer builds:
+#
+# Usage:
+#   docker build -f infra/docker/Dockerfile.test -t flow-ami-test .
+#   docker run -d --privileged --name flow-ami-test flow-ami-test
+#   docker exec -it flow-ami-test bash
+
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install systemd
+RUN apt-get update && apt-get install -y systemd systemd-sysv sudo curl xterm x11-utils
+
+# To avoid running into issues with systemd in a container, mask some services
+RUN systemctl mask systemd-udevd.service \
+                   systemd-udevd-kernel.socket \
+                   systemd-udevd-control.socket \
+                   systemd-modules-load.service \
+                   sys-kernel-debug.mount \
+                   sys-kernel-tracing.mount
+
+# Add ubuntu user to match AWS EC2 AMI setup
+RUN usermod -aG sudo ubuntu && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Copy and execute the provisioning script
+COPY infra/packer/scripts/install_deps.sh /tmp/install_deps.sh
+RUN chmod +x /tmp/install_deps.sh && su - ubuntu -c "sudo /tmp/install_deps.sh"
+
+# Copy systemd units
+COPY infra/packer/files/vncserver.service /etc/systemd/system/vncserver.service
+COPY infra/packer/files/vncproxy.service /etc/systemd/system/vncproxy.service
+COPY infra/packer/files/chrome.service /etc/systemd/system/chrome.service
+COPY infra/packer/files/openbox.service /etc/systemd/system/openbox.service
+
+# Enable them
+RUN systemctl enable vncserver openbox vncproxy chrome
+
+# Setup systemd as init
+STOPSIGNAL SIGRTMIN+3
+CMD ["/lib/systemd/systemd"]

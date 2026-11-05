@@ -1,0 +1,13 @@
+[Unit]
+Description=TigerVNC Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=ubuntu
+ExecStartPre=-/usr/bin/vncserver -kill :0
+ExecStart=/usr/bin/Xtigervnc :0 -geometry 1600x1200 -depth 24 -localhost=1 -SecurityTypes None
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

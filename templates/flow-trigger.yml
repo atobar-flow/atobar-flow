@@ -1,0 +1,6 @@
+# Deprecated. Do not copy this file.
+#
+# Client Repos get their trigger workflow from the onboarding script:
+#   curl -fsSL "https://$CP_HOSTNAME/onboard.sh" | bash
+# The generated workflow authenticates to the Control Panel with ATOBAR_TENANT_TOKEN instead of a
+# FLOW_DISPATCH_TOKEN PAT. Source: src/control_panel/client_templates.py. Guide: docs/ONBOARDING.md

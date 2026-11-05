@@ -1,0 +1,60 @@
+# Terraform
+**/.terraform/*
+.terraform/
+*.tfstate
+*.tfstate*
+*.tfstate.*
+src/control_panel/deploy.json
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
+# Local Environment
+.env
+.env.*
+.env*.local
+!.env.sample
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Debug & Screen Captures
+*.b64
+live_capture_*
+dashboard_*
+
+# Atobar Agent Runtime State
+.atobar/state.json
+.atobar/trace.jsonl
+.atobar/artifacts/
+.atobar/ops-state/
+ops_display_*.png
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Local harness artifacts
+.devin/
+
+# Secrets
+*.pem
+
+# Tenant metric probes are source, not generated dashboards
+!tenants/**/.atobar/metrics/*

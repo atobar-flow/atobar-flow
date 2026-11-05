@@ -1,0 +1,12 @@
+[Unit]
+Description=Websockify VNC Proxy
+After=vncserver.service
+
+[Service]
+Type=simple
+User=ubuntu
+ExecStart=/usr/bin/websockify 127.0.0.1:6080 localhost:5901
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

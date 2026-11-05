@@ -1,0 +1,14 @@
+[Unit]
+Description=Openbox Window Manager
+After=vncserver.service
+Requires=vncserver.service
+
+[Service]
+Type=simple
+User=ubuntu
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/openbox --sm-disable
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

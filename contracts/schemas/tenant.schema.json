@@ -1,0 +1,503 @@
+{
+  "$defs": {
+    "ArbitrationPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "default": "shadow",
+          "enum": [
+            "shadow",
+            "recommend",
+            "auto_merge"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "merge_method": {
+          "default": "squash",
+          "enum": [
+            "squash",
+            "merge",
+            "rebase"
+          ],
+          "title": "Merge Method",
+          "type": "string"
+        },
+        "require_human_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Require Human Label"
+        }
+      },
+      "title": "ArbitrationPolicy",
+      "type": "object"
+    },
+    "GoalBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "max_goal_cost_usd": {
+          "default": 100.0,
+          "exclusiveMinimum": 0,
+          "maximum": 5000.0,
+          "title": "Max Goal Cost Usd",
+          "type": "number"
+        },
+        "max_goal_prs": {
+          "default": 10,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Max Goal Prs",
+          "type": "integer"
+        },
+        "max_goal_days": {
+          "default": 14,
+          "maximum": 90,
+          "minimum": 1,
+          "title": "Max Goal Days",
+          "type": "integer"
+        }
+      },
+      "title": "GoalBudget",
+      "type": "object"
+    },
+    "GoalStallPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "max_merges_without_progress": {
+          "default": 3,
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Max Merges Without Progress",
+          "type": "integer"
+        },
+        "max_open_planned_issues": {
+          "default": 2,
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Max Open Planned Issues",
+          "type": "integer"
+        }
+      },
+      "title": "GoalStallPolicy",
+      "type": "object"
+    },
+    "LoopLimits": {
+      "additionalProperties": false,
+      "properties": {
+        "max_review_rounds": {
+          "default": 4,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Max Review Rounds",
+          "type": "integer"
+        },
+        "max_repeated_finding": {
+          "default": 2,
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Max Repeated Finding",
+          "type": "integer"
+        },
+        "max_pr_wall_clock_minutes": {
+          "default": 240,
+          "maximum": 1440,
+          "minimum": 10,
+          "title": "Max Pr Wall Clock Minutes",
+          "type": "integer"
+        },
+        "max_pr_cost_usd": {
+          "default": 25,
+          "exclusiveMinimum": 0,
+          "maximum": 200,
+          "title": "Max Pr Cost Usd",
+          "type": "number"
+        },
+        "agent_runtime": {
+          "default": "nanobot",
+          "enum": [
+            "native",
+            "nanobot"
+          ],
+          "title": "Agent Runtime",
+          "type": "string"
+        }
+      },
+      "title": "LoopLimits",
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Key",
+          "type": "string"
+        },
+        "run": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Shell command whose last stdout line is a number.",
+          "title": "Run"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "comparator": {
+          "enum": [
+            ">=",
+            "<=",
+            ">",
+            "<",
+            "=="
+          ],
+          "title": "Comparator",
+          "type": "string"
+        },
+        "threshold": {
+          "title": "Threshold",
+          "type": "number"
+        },
+        "baseline_mode": {
+          "default": "absolute",
+          "enum": [
+            "absolute",
+            "no_regression"
+          ],
+          "title": "Baseline Mode",
+          "type": "string"
+        },
+        "tolerance_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tolerance Pct"
+        },
+        "min_progress_delta": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Progress Delta"
+        },
+        "min_samples": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Min Samples",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "key",
+        "comparator",
+        "threshold"
+      ],
+      "title": "Metric",
+      "type": "object"
+    },
+    "MetricSource": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "default": "check_run_output",
+          "title": "Kind",
+          "type": "string"
+        },
+        "check_name": {
+          "default": "flow-metrics",
+          "title": "Check Name",
+          "type": "string"
+        },
+        "workflow_path": {
+          "default": ".github/workflows/flow-metrics.yml",
+          "title": "Workflow Path",
+          "type": "string"
+        }
+      },
+      "title": "MetricSource",
+      "type": "object"
+    },
+    "MetricsRuntime": {
+      "additionalProperties": false,
+      "properties": {
+        "python_version": {
+          "default": "3.12",
+          "title": "Python Version",
+          "type": "string"
+        },
+        "setup": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Setup",
+          "type": "array"
+        }
+      },
+      "title": "MetricsRuntime",
+      "type": "object"
+    },
+    "RoleLLMConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "default": "gemini",
+          "enum": [
+            "gemini",
+            "claude",
+            "deepseek",
+            "grok",
+            "openai",
+            "anthropic",
+            "xai"
+          ],
+          "title": "Provider",
+          "type": "string"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "title": "RoleLLMConfig",
+      "type": "object"
+    },
+    "TenantGoal": {
+      "additionalProperties": false,
+      "properties": {
+        "objective": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Objective",
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Targets",
+          "type": "array"
+        },
+        "guardrails": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Guardrails",
+          "type": "array"
+        },
+        "autonomy": {
+          "default": "approve",
+          "enum": [
+            "approve",
+            "auto"
+          ],
+          "title": "Autonomy",
+          "type": "string"
+        },
+        "tracking_issue_number": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tracking Issue Number"
+        },
+        "budget": {
+          "$ref": "#/$defs/GoalBudget"
+        },
+        "stall": {
+          "$ref": "#/$defs/GoalStallPolicy"
+        }
+      },
+      "required": [
+        "objective",
+        "targets"
+      ],
+      "title": "TenantGoal",
+      "type": "object"
+    },
+    "TenantLLMConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoleLLMConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "developer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoleLLMConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evaluator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoleLLMConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "arbitrator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoleLLMConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "TenantLLMConfig",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "repo": {
+      "title": "Repo",
+      "type": "string"
+    },
+    "default_branch": {
+      "default": "main",
+      "title": "Default Branch",
+      "type": "string"
+    },
+    "owner_github_login": {
+      "title": "Owner Github Login",
+      "type": "string"
+    },
+    "required_checks": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Checks",
+      "type": "array"
+    },
+    "protected_paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Protected Paths",
+      "type": "array"
+    },
+    "metrics_workflow_path": {
+      "default": ".github/workflows/flow-metrics.yml",
+      "title": "Metrics Workflow Path",
+      "type": "string"
+    },
+    "arbitration": {
+      "$ref": "#/$defs/ArbitrationPolicy"
+    },
+    "arbitration_mode": {
+      "anyOf": [
+        {
+          "enum": [
+            "shadow",
+            "recommend",
+            "auto_merge"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Deprecated: use arbitration.mode instead.",
+      "title": "Arbitration Mode"
+    },
+    "llm": {
+      "$ref": "#/$defs/TenantLLMConfig"
+    },
+    "loop": {
+      "$ref": "#/$defs/LoopLimits"
+    },
+    "metrics_runtime": {
+      "$ref": "#/$defs/MetricsRuntime"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/Metric"
+      },
+      "minItems": 1,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "goal": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TenantGoal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "repo",
+    "owner_github_login",
+    "metrics"
+  ],
+  "title": "TenantManifest",
+  "type": "object"
+}
